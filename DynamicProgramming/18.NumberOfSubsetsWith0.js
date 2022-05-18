@@ -1,20 +1,17 @@
-//https://www.codingninjas.com/codestudio/problems/number-of-subsets_3952532
-
-// DP - Approach 1 - Recursive Approach with Memoization(top to bottom)
 function findWays(arr, n, k) {
   const fn = (idx, target, dpArray) => {
-    if (target === 0) return 1;
     if (idx === 0) {
-      return arr[0] === target ? 1 : 0;
+      if (arr[idx] === 0 && target === 0) return 2;
+      if (target === 0 || arr[idx] === target) return 1;
+      return 0;
     }
-
     if (dpArray[idx][target] !== -1) return dpArray[idx][target];
 
-    const notPick = fn(idx - 1, target, dpArray);
     const pick =
       arr[idx] <= target ? fn(idx - 1, target - arr[idx], dpArray) : 0;
+    const notPick = fn(idx - 1, target, dpArray);
 
-    return (dpArray[idx][target] = notPick + pick);
+    return (dpArray[idx][target] = pick + notPick);
   };
 
   return fn(
@@ -24,49 +21,47 @@ function findWays(arr, n, k) {
   );
 }
 
-// DP - Approach 2 - Tabulation Approach (bottom to top) without Space Optimisation
 function findWays(arr, n, k) {
-  const dpArray = Array.from(Array(n), () => new Array(k + 1).fill(0));
+  let dpArray = Array.from(Array(n), () => new Array(k + 1).fill(0));
+  if (arr[0] === 0) dpArray[0][0] = 2;
+  else dpArray[0][0] = 1;
 
-  for (let i = 0; i < n; i++) {
-    dpArray[i][0] = 1;
-  }
-
-  if (arr[0] <= k) dpArray[0][arr[0]] = 1;
+  if (arr[0] !== 0 && arr[0] <= k) dpArray[0][arr[0]] = 1;
 
   for (let idx = 1; idx < n; idx++) {
     for (let target = 0; target <= k; target++) {
-      const notPick = dpArray[idx - 1][target];
       const pick = arr[idx] <= target ? dpArray[idx - 1][target - arr[idx]] : 0;
+      const notPick = dpArray[idx - 1][target];
 
-      dpArray[idx][target] = notPick + pick;
+      dpArray[idx][target] = pick + notPick;
     }
   }
+
   return dpArray[n - 1][k];
 }
 
-// DP - Approach 3 - Tabulation Approach (bottom to top) with Space Optimisation
 function findWays(arr, n, k) {
   let prev = new Array(k + 1).fill(0);
-  prev[0] = 1;
+  if (arr[0] === 0) prev[0] = 2;
+  else prev[0] = 1;
 
-  if (arr[0] <= k) prev[arr[0]] = 1;
+  if (arr[0] !== 0 && arr[0] <= k) prev[arr[0]] = 1;
 
   for (let idx = 1; idx < n; idx++) {
     let curr = new Array(k + 1).fill(0);
-    curr[0] = 1;
     for (let target = 0; target <= k; target++) {
-      const notPick = prev[target];
       const pick = arr[idx] <= target ? prev[target - arr[idx]] : 0;
+      const notPick = prev[target];
 
-      curr[target] = notPick + pick;
+      curr[target] = pick + notPick;
     }
     prev = curr;
   }
+
   return prev[k];
 }
 
-const arr = [1, 2, 2, 3];
+const arr = [0, 0, 1];
 const arrSize = arr.length;
-const output = findWays(arr, arrSize, 3);
+const output = findWays(arr, arrSize, 1);
 console.log(output);
