@@ -3,7 +3,7 @@ function minimumCoins(coins, n, k) {
   const fn = (idx, target, dpArray) => {
     if (idx === 0) {
       if (target % coins[0] === 0) return target / coins[0];
-      else Infinity;
+      else return Infinity;
     }
 
     if (dpArray[idx][target] !== -1) return dpArray[idx][target];
